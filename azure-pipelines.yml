@@ -34,7 +34,7 @@ steps:
 
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: '<name-from-service-connection>'  # We'll set this up
+    azureSubscription: 'Con1'  # We'll set this up
     appType: 'webAppLinux'
     appName: '$(appName)'
     package: '$(packageDir)/app.zip'
