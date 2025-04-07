@@ -4,17 +4,37 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  appName: 'nodejs'  # Change this
+  packageDir: '$(Build.ArtifactStagingDirectory)/webapp'
+
 steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: '14.x'
-    displayName: 'Install Node.js'
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+  displayName: 'Install Node.js'
 
-  - script: |
-      npm install
-      npm run build
-    displayName: 'Install dependencies and build'
+- script: |
+    npm install
+    npm run build
+  displayName: 'Build App'
 
-  - script: |
-      npm test
-    displayName: 'Run tests'
+- script: |
+    npm test
+  displayName: 'Run Tests'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(packageDir)/app.zip'
+    replaceExistingArchive: true
+  displayName: 'Archive App'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '<name-from-service-connection>'  # We'll set this up
+    appType: 'webAppLinux'
+    appName: '$(appName)'
+    package: '$(packageDir)/app.zip'
